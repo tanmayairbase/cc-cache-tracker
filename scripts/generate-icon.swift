@@ -9,11 +9,11 @@ image.lockFocus()
 
 let bgRect = NSRect(x: 0, y: 0, width: size, height: size)
 let bgPath = NSBezierPath(roundedRect: bgRect, xRadius: size * 0.22, yRadius: size * 0.22)
-let gradient = NSGradient(colors: [
-    NSColor(calibratedRed: 0.92, green: 0.49, blue: 0.13, alpha: 1.0),
-    NSColor(calibratedRed: 0.80, green: 0.32, blue: 0.10, alpha: 1.0),
-])
-gradient?.draw(in: bgPath, angle: -90)
+// #D97757 — Claude's brand orange. Colors aren't copyrightable; this is a
+// solid fill, not Anthropic's logo/wordmark.
+let claudeOrange = NSColor(calibratedRed: 217.0 / 255, green: 119.0 / 255, blue: 87.0 / 255, alpha: 1.0)
+claudeOrange.setFill()
+bgPath.fill()
 
 if let symbol = NSImage(systemSymbolName: "terminal.fill", accessibilityDescription: nil) {
     let config = NSImage.SymbolConfiguration(pointSize: size * 0.5, weight: .semibold)
