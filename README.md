@@ -4,7 +4,7 @@
 </div>
 
 Claude Code's prompt cache has a 1-hour TTL. There's no API to check if a
-session's cache is still warm — the only real signal is time since last
+session's cache is still warm; the only real signal is time since last
 activity. Lose track of that and you eat an expensive silent re-ingestion
 next time you touch a stale session. CacheTracker watches your active
 sessions' last-activity time and warns you before that happens.
@@ -29,7 +29,7 @@ Requires `jq`.
 open CacheTracker.app
 ```
 
-Grant notification permission when prompted. No Dock icon — menu bar only.
+Grant notification permission when prompted. No Dock icon, menu bar only.
 No launch-at-login yet, so relaunch after reboots.
 
 ## How it works
