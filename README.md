@@ -1,5 +1,7 @@
 # CacheTracker
 
+<img src="docs/icon.png" width="96" height="96" alt="CacheTracker icon">
+
 Claude Code's prompt cache has a 1-hour TTL. There's no API to check if a
 session's cache is still warm — the only real signal is time since last
 activity. Losing track of that means an expensive silent re-ingestion next
