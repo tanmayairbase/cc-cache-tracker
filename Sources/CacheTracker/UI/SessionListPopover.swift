@@ -40,6 +40,16 @@ private struct SessionRow: View {
         }
     }
 
+    private var relativeTime: String {
+        let elapsed = Int(Date().timeIntervalSince(info.state.lastTouchDate))
+        if elapsed < 60 { return "just now" }
+        let minutes = elapsed / 60
+        if minutes < 60 { return "\(minutes)m ago" }
+        let hours = minutes / 60
+        let remainingMinutes = minutes % 60
+        return remainingMinutes == 0 ? "\(hours)h ago" : "\(hours)h \(remainingMinutes)m ago"
+    }
+
     var body: some View {
         HStack {
             Circle()
@@ -54,6 +64,9 @@ private struct SessionRow: View {
                     .foregroundColor(.secondary)
                     .lineLimit(1)
                     .truncationMode(.middle)
+                Text(relativeTime)
+                    .font(.system(size: 11))
+                    .foregroundColor(.secondary)
             }
 
             Spacer()
