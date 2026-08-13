@@ -24,7 +24,8 @@ final class MenuBarController: NSObject, NSWindowDelegate {
 
         if let button = statusItem.button {
             button.target = self
-            button.action = #selector(togglePopover)
+            button.action = #selector(handleClick)
+            button.sendAction(on: [.leftMouseUp, .rightMouseUp])
         }
 
         updateBadgeImage(sessions: poller.sessions)
@@ -84,7 +85,31 @@ final class MenuBarController: NSObject, NSWindowDelegate {
         statusItem.button?.image = image
     }
 
-    @objc private func togglePopover() {
+    @objc private func handleClick() {
+        guard let event = NSApp.currentEvent else { return }
+        if event.type == .rightMouseUp {
+            showContextMenu()
+        } else {
+            togglePopover()
+        }
+    }
+
+    private func showContextMenu() {
+        sessionWindow.orderOut(nil)
+        let menu = NSMenu()
+        let quitItem = NSMenuItem(title: "Quit CacheTracker", action: #selector(quit), keyEquivalent: "q")
+        quitItem.target = self
+        menu.addItem(quitItem)
+        statusItem.menu = menu
+        statusItem.button?.performClick(nil)
+        statusItem.menu = nil
+    }
+
+    @objc private func quit() {
+        NSApp.terminate(nil)
+    }
+
+    private func togglePopover() {
         guard let button = statusItem.button else { return }
         if sessionWindow.isVisible {
             sessionWindow.orderOut(nil)
