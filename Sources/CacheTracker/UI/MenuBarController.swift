@@ -50,24 +50,27 @@ final class MenuBarController: NSObject, NSWindowDelegate {
         let image = NSImage(size: size)
         image.lockFocus()
 
-        // App glyph, tinted to match the menu bar's current label color so
-        // it reads correctly in both light and dark menu bars. A template
-        // image would ignore the tint and render as a monochrome mask, so
-        // tint a copy the same way the app icon does: sourceAtop confined
-        // to the glyph's own bitmap.
+        // Same colored background as the app icon (not tinted to the menu
+        // bar's label color) so it stays recognizable/colorful rather than
+        // going flat black-and-white like a template image would.
+        let iconSize: CGFloat = 18
+        let iconOrigin = NSPoint(x: 0, y: (size.height - iconSize) / 2)
+        let bgRect = NSRect(origin: iconOrigin, size: NSSize(width: iconSize, height: iconSize))
+        let claudeOrange = NSColor(srgbRed: 217.0 / 255, green: 119.0 / 255, blue: 87.0 / 255, alpha: 1.0)
+        claudeOrange.setFill()
+        NSBezierPath(roundedRect: bgRect, xRadius: iconSize * 0.22, yRadius: iconSize * 0.22).fill()
+
         if let symbol = NSImage(systemSymbolName: "terminal.fill", accessibilityDescription: nil) {
-            let config = NSImage.SymbolConfiguration(pointSize: 14, weight: .medium)
+            let config = NSImage.SymbolConfiguration(pointSize: iconSize * 0.5, weight: .semibold)
             let glyph = symbol.withSymbolConfiguration(config)!
 
-            let tinted = NSImage(size: glyph.size)
-            tinted.lockFocus()
-            glyph.draw(at: .zero, from: .zero, operation: .sourceOver, fraction: 1.0)
-            NSColor.labelColor.setFill()
-            NSRect(origin: .zero, size: glyph.size).fill(using: .sourceAtop)
-            tinted.unlockFocus()
-
-            let origin = NSPoint(x: 0, y: (size.height - tinted.size.height) / 2)
-            tinted.draw(at: origin, from: .zero, operation: .sourceOver, fraction: 1.0)
+            let origin = NSPoint(
+                x: bgRect.midX - glyph.size.width / 2,
+                y: bgRect.midY - glyph.size.height / 2
+            )
+            NSColor.black.set()
+            glyph.isTemplate = true
+            glyph.draw(at: origin, from: .zero, operation: .sourceOver, fraction: 1.0)
         }
 
         // Plain colored status dot, no count, in the bottom-right corner.
