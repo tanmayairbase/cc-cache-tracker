@@ -44,4 +44,5 @@ their state file is left on disk.
 ## Uninstall
 
 Remove the `hooks/cache-touch.sh` entries from `~/.claude/settings.json`,
-quit the app, optionally delete `~/.claude/cache-tracker/`.
+quit the app, delete `/Applications/CacheTracker.app`, optionally delete
+`~/.claude/cache-tracker/`.
