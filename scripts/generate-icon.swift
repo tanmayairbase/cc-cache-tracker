@@ -11,24 +11,35 @@ let bgRect = NSRect(x: 0, y: 0, width: size, height: size)
 let bgPath = NSBezierPath(roundedRect: bgRect, xRadius: size * 0.22, yRadius: size * 0.22)
 // #D97757 — Claude's brand orange. Colors aren't copyrightable; this is a
 // solid fill, not Anthropic's logo/wordmark.
-let claudeOrange = NSColor(calibratedRed: 217.0 / 255, green: 119.0 / 255, blue: 87.0 / 255, alpha: 1.0)
+let claudeOrange = NSColor(srgbRed: 217.0 / 255, green: 119.0 / 255, blue: 87.0 / 255, alpha: 1.0)
 claudeOrange.setFill()
 bgPath.fill()
 
 if let symbol = NSImage(systemSymbolName: "terminal.fill", accessibilityDescription: nil) {
     let config = NSImage.SymbolConfiguration(pointSize: size * 0.5, weight: .semibold)
-    let tinted = symbol.withSymbolConfiguration(config)!
-    let symSize = tinted.size
+    let glyph = symbol.withSymbolConfiguration(config)!
+
+    // A template image ignores any color you set and renders as a
+    // system-controlled monochrome mask (comes out black), so tint a copy
+    // of it white first — masking white fill to the glyph's own alpha via
+    // sourceAtop, confined to the glyph's own bitmap, not the outer canvas.
+    let whiteGlyph = NSImage(size: glyph.size)
+    whiteGlyph.lockFocus()
+    glyph.draw(at: .zero, from: .zero, operation: .sourceOver, fraction: 1.0)
+    NSColor.white.setFill()
+    NSRect(origin: .zero, size: glyph.size).fill(using: .sourceAtop)
+    whiteGlyph.unlockFocus()
+
+    let symSize = whiteGlyph.size
     let scale = (size * 0.56) / max(symSize.width, symSize.height)
     let drawSize = NSSize(width: symSize.width * scale, height: symSize.height * scale)
-    let origin = NSPoint(x: (size - drawSize.width) / 2, y: (size - drawSize.height) / 2)
-
-    NSColor.white.set()
-    let context = NSGraphicsContext.current!
-    context.saveGraphicsState()
-    tinted.isTemplate = true
-    tinted.draw(in: NSRect(origin: origin, size: drawSize), from: .zero, operation: .sourceOver, fraction: 1.0)
-    context.restoreGraphicsState()
+    let drawRect = NSRect(
+        x: (size - drawSize.width) / 2,
+        y: (size - drawSize.height) / 2,
+        width: drawSize.width,
+        height: drawSize.height
+    )
+    whiteGlyph.draw(in: drawRect, from: .zero, operation: .sourceOver, fraction: 1.0)
 }
 
 image.unlockFocus()
