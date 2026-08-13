@@ -1,16 +1,17 @@
-# CacheTracker
-
-<img src="docs/icon.png" width="96" height="96" alt="CacheTracker icon">
+<div align="center">
+  <img src="docs/icon.png" width="96" height="96" alt="CacheTracker icon">
+  <h1>CacheTracker</h1>
+</div>
 
 Claude Code's prompt cache has a 1-hour TTL. There's no API to check if a
 session's cache is still warm — the only real signal is time since last
-activity. Losing track of that means an expensive silent re-ingestion next
-time you touch a stale session. This is a menu bar app that watches your
-active sessions' last-activity time and warns you before that happens.
+activity. Lose track of that and you eat an expensive silent re-ingestion
+next time you touch a stale session. CacheTracker watches your active
+sessions' last-activity time and warns you before that happens.
 
-It's a menu bar app rather than notch-positioned because most of the team
-works off external monitors. See `handoff-notch-cache-tracker.md` for the
-full design history.
+It lives in the menu bar rather than next to the notch because most of the
+team works off external monitors. See `handoff-notch-cache-tracker.md` for
+the full design history.
 
 - Badge = count of active sessions, colored by worst case: **blue** (fresh),
   **orange** (45–60 min idle), **red** (60+ min idle, not handed off).
