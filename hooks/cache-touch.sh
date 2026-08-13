@@ -14,14 +14,21 @@ HASH=$(echo -n "$CWD" | md5 | cut -c1-8)
 STATE_DIR="$HOME/.claude/cache-tracker"
 mkdir -p "$STATE_DIR"
 
-# Prefer the custom-title Claude Code generates for the session (appears as
-# a {"type":"custom-title","customTitle":"..."} line anywhere in the
-# transcript, once generated, not necessarily the first line — take the
-# last one in case it's regenerated); fall back to the directory name if
-# it's missing.
+# Prefer ai-title (the auto-generated name shown in Claude Code's own
+# "Resume session" picker), then custom-title (a user-set override), then
+# the directory name. Both appear as {"type":...} lines anywhere in the
+# transcript, not necessarily the first line, and can repeat as they're
+# regenerated, so take the last occurrence of whichever is found.
 TITLE=""
 if [[ -f "$TRANSCRIPT" ]]; then
-  TITLE=$(grep -a 'custom-title' "$TRANSCRIPT" 2>/dev/null | tail -n 1 | jq -r 'select(.type == "custom-title") | .customTitle' 2>/dev/null || true)
+  TITLE=$(grep -a -E '"type": ?"ai-title"' "$TRANSCRIPT" 2>/dev/null \
+    | while IFS= read -r line; do echo "$line" | jq -r 'select(.type == "ai-title") | .aiTitle' 2>/dev/null; done \
+    | tail -n 1 || true)
+fi
+if [[ -z "$TITLE" || "$TITLE" == "null" ]] && [[ -f "$TRANSCRIPT" ]]; then
+  TITLE=$(grep -a -E '"type": ?"custom-title"' "$TRANSCRIPT" 2>/dev/null \
+    | while IFS= read -r line; do echo "$line" | jq -r 'select(.type == "custom-title") | .customTitle' 2>/dev/null; done \
+    | tail -n 1 || true)
 fi
 if [[ -z "$TITLE" || "$TITLE" == "null" ]]; then
   TITLE=$(basename "$CWD")

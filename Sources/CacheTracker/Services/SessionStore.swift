@@ -58,6 +58,9 @@ final class SessionStore {
             if age > CacheThresholds.staleHideSeconds {
                 continue
             }
+            if !FileManager.default.fileExists(atPath: state.transcriptPath) {
+                continue
+            }
 
             var handedOff = false
             if let markedAt = handoffs[state.sessionId] {
