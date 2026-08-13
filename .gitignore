@@ -1,3 +1,4 @@
 .build/
 CacheTracker.app/
 *.icns.bak
+.DS_Store
