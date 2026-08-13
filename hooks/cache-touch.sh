@@ -1,5 +1,8 @@
 #!/bin/bash
-# Claude Code hook (PreToolUse/PostToolUse/SessionStart, matcher "*", sync).
+# Claude Code hook (PreToolUse/PostToolUse/UserPromptSubmit, matcher "*", sync).
+# Not SessionStart: merely resuming/viewing a session (e.g. clicking it in
+# the macOS app's sidebar) fires SessionStart without any real API call, so
+# it would falsely reset the tracked activity time.
 # Reads the hook JSON envelope on stdin and records last-activity state for
 # the CacheTracker menu bar app. See README.md.
 set -euo pipefail

@@ -35,9 +35,22 @@ jq \
         else $existing + [{matcher: "*", hooks: [{type: "command", command: $command}]}]
         end);
 
-  addHook("PreToolUse")
+  # Merely resuming/opening a session (SessionStart) does not touch the
+  # actual prompt cache, so it should not reset last-activity. Drop any
+  # prior install of this hook on that event.
+  def removeHook(event):
+    if (.hooks[event]? != null) then
+      .hooks[event] = (.hooks[event] | map(
+        if .matcher == "*" then
+          .hooks = (.hooks | map(select(.command != $command)))
+        else . end
+      ) | map(select((.hooks | length) > 0)))
+    else . end;
+
+  removeHook("SessionStart")
+  | addHook("PreToolUse")
   | addHook("PostToolUse")
-  | addHook("SessionStart")
+  | addHook("UserPromptSubmit")
   ' \
   "$SETTINGS" > "$TMP"
 

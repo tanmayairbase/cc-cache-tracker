@@ -34,8 +34,11 @@ No launch-at-login yet, so relaunch after reboots.
 
 ## How it works
 
-`hooks/cache-touch.sh` fires on every Claude Code tool call and on session
-start, writing last-activity state to `~/.claude/cache-tracker/`. The app
+`hooks/cache-touch.sh` fires on every Claude Code tool call and user prompt
+submit, writing last-activity state to `~/.claude/cache-tracker/`. It does
+not fire on `SessionStart`: just resuming/opening a session (e.g. clicking
+it in the macOS app's sidebar) doesn't send anything to the API, so that
+event doesn't move the timer. The app
 polls that directory every 60s and computes status from elapsed time.
 Marking a session done writes to a separate `handoffs.json` so it's never
 clobbered by the hook. Sessions idle 24h+ drop out of the active list but
