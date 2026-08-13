@@ -14,11 +14,14 @@ HASH=$(echo -n "$CWD" | md5 | cut -c1-8)
 STATE_DIR="$HOME/.claude/cache-tracker"
 mkdir -p "$STATE_DIR"
 
-# Prefer the ai-title Claude Code writes as the transcript's first line;
-# fall back to the directory name if it's missing/malformed.
+# Prefer the custom-title Claude Code generates for the session (appears as
+# a {"type":"custom-title","customTitle":"..."} line anywhere in the
+# transcript, once generated, not necessarily the first line — take the
+# last one in case it's regenerated); fall back to the directory name if
+# it's missing.
 TITLE=""
 if [[ -f "$TRANSCRIPT" ]]; then
-  TITLE=$(head -n 1 "$TRANSCRIPT" 2>/dev/null | jq -r 'select(.type == "ai-title") | .aiTitle' 2>/dev/null || true)
+  TITLE=$(grep -a 'custom-title' "$TRANSCRIPT" 2>/dev/null | tail -n 1 | jq -r 'select(.type == "custom-title") | .customTitle' 2>/dev/null || true)
 fi
 if [[ -z "$TITLE" || "$TITLE" == "null" ]]; then
   TITLE=$(basename "$CWD")
