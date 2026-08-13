@@ -39,31 +39,44 @@ final class MenuBarController: NSObject, NSWindowDelegate {
     private func updateBadgeImage(sessions: [SessionInfo]) {
         let activeSessions = sessions.filter { !$0.done }
         let worstStatus = activeSessions.map(\.status).max() ?? .fresh
-        let color: NSColor
+        let statusColor: NSColor
         switch worstStatus {
-        case .fresh: color = .systemBlue
-        case .orange: color = .systemOrange
-        case .red: color = .systemRed
+        case .fresh: statusColor = .systemBlue
+        case .orange: statusColor = .systemOrange
+        case .red: statusColor = .systemRed
         }
 
-        let size = NSSize(width: 20, height: 20)
-        let image = NSImage(size: size, flipped: false) { rect in
-            color.setFill()
-            NSBezierPath(ovalIn: rect).fill()
+        let size = NSSize(width: 22, height: 20)
+        let image = NSImage(size: size)
+        image.lockFocus()
 
-            let text = "\(activeSessions.count)" as NSString
-            let attrs: [NSAttributedString.Key: Any] = [
-                .font: NSFont.boldSystemFont(ofSize: 11),
-                .foregroundColor: NSColor.white,
-            ]
-            let textSize = text.size(withAttributes: attrs)
-            let textOrigin = NSPoint(
-                x: rect.midX - textSize.width / 2,
-                y: rect.midY - textSize.height / 2
-            )
-            text.draw(at: textOrigin, withAttributes: attrs)
-            return true
+        // App glyph, tinted to match the menu bar's current label color so
+        // it reads correctly in both light and dark menu bars. A template
+        // image would ignore the tint and render as a monochrome mask, so
+        // tint a copy the same way the app icon does: sourceAtop confined
+        // to the glyph's own bitmap.
+        if let symbol = NSImage(systemSymbolName: "terminal.fill", accessibilityDescription: nil) {
+            let config = NSImage.SymbolConfiguration(pointSize: 14, weight: .medium)
+            let glyph = symbol.withSymbolConfiguration(config)!
+
+            let tinted = NSImage(size: glyph.size)
+            tinted.lockFocus()
+            glyph.draw(at: .zero, from: .zero, operation: .sourceOver, fraction: 1.0)
+            NSColor.labelColor.setFill()
+            NSRect(origin: .zero, size: glyph.size).fill(using: .sourceAtop)
+            tinted.unlockFocus()
+
+            let origin = NSPoint(x: 0, y: (size.height - tinted.size.height) / 2)
+            tinted.draw(at: origin, from: .zero, operation: .sourceOver, fraction: 1.0)
         }
+
+        // Plain colored status dot, no count, in the bottom-right corner.
+        let dotSize: CGFloat = 8
+        let dotRect = NSRect(x: size.width - dotSize, y: 0, width: dotSize, height: dotSize)
+        statusColor.setFill()
+        NSBezierPath(ovalIn: dotRect).fill()
+
+        image.unlockFocus()
         image.isTemplate = false
         statusItem.button?.image = image
     }
