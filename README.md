@@ -10,8 +10,7 @@ next time you touch a stale session. CacheTracker watches your active
 sessions' last-activity time and warns you before that happens.
 
 It lives in the menu bar, not pinned to a specific spot on the built-in
-display, because most of the team works off external monitors. See
-`handoff-notch-cache-tracker.md` for the full design history.
+display, because most of the team works off external monitors.
 
 - Badge = count of active sessions, colored by worst case: **blue** (fresh),
   **orange** (45–60 min idle), **red** (60+ min idle, not handed off).
