@@ -3,8 +3,8 @@ import Foundation
 /// Hardcoded thresholds per the 1-hour org cache TTL (see handoff doc section 1/9).
 /// No settings UI / UserDefaults plumbing for v1 — these are intentionally fixed.
 enum CacheThresholds {
-    static let freshToOrangeSeconds: TimeInterval = 45 * 60
-    static let orangeToRedSeconds: TimeInterval = 60 * 60
+    static let freshToOrangeSeconds: TimeInterval = 40 * 60
+    static let orangeToRedSeconds: TimeInterval = 55 * 60
     /// Sessions with no activity for this long are excluded from the active list.
     static let staleHideSeconds: TimeInterval = 24 * 60 * 60
 }

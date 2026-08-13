@@ -13,8 +13,9 @@ It lives in the menu bar, not pinned to a specific spot on the built-in
 display, because most of the team works off external monitors.
 
 - Badge = count of active sessions, colored by worst case: **blue** (fresh),
-  **orange** (45–60 min idle), **red** (60+ min idle, not handed off).
-- Notification when a session first crosses into orange.
+  **orange** (40–55 min idle), **red** (55+ min idle, not handed off).
+- Notification when a session first crosses into orange, and again when it
+  crosses into red.
 - Click the badge for a session list; check one off to mark it done/handed
   off (auto-reopens if that session sees new activity).
 

@@ -22,7 +22,19 @@ final class NotificationService {
         content.title = "Cache expiring soon"
         content.body = "Cache expiring in 15m for '\(sessionTitle)' (\(dirName))"
         content.sound = .default
+        post(content)
+    }
 
+    func notifyExpired(sessionTitle: String, cwd: String) {
+        let dirName = (cwd as NSString).lastPathComponent
+        let content = UNMutableNotificationContent()
+        content.title = "Cache expired"
+        content.body = "Cache likely expired for '\(sessionTitle)' (\(dirName))"
+        content.sound = .default
+        post(content)
+    }
+
+    private func post(_ content: UNMutableNotificationContent) {
         let request = UNNotificationRequest(
             identifier: UUID().uuidString,
             content: content,

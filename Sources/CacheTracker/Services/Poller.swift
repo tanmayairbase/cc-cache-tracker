@@ -2,9 +2,9 @@ import Foundation
 import Combine
 
 /// Polls SessionStore every 60s, recomputes statuses, and fires a
-/// notification only on a fresh->orange transition per session_id (not on
-/// every poll while orange, not on orange->red, not for a new session that
-/// enters already-orange).
+/// notification on fresh->orange and orange->red transitions per
+/// session_id (not on every poll while a status holds, not for a new
+/// session that enters already-orange/red).
 final class Poller: ObservableObject {
     @Published private(set) var sessions: [SessionInfo] = []
 
@@ -42,6 +42,8 @@ final class Poller: ObservableObject {
             let previous = previousStatuses[info.id]
             if previous == .fresh && info.status == .orange {
                 notificationService.notifyExpiringSoon(sessionTitle: info.title, cwd: info.cwd)
+            } else if previous == .orange && info.status == .red {
+                notificationService.notifyExpired(sessionTitle: info.title, cwd: info.cwd)
             }
             previousStatuses[info.id] = info.status
         }
