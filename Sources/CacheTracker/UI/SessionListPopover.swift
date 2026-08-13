@@ -23,7 +23,7 @@ struct SessionListPopover: View {
                 }
             }
         }
-        .frame(width: 320)
+        .frame(width: 384)
         .padding(.bottom, 8)
     }
 }
@@ -38,6 +38,12 @@ private struct SessionRow: View {
         case .orange: return .orange
         case .red: return .red
         }
+    }
+
+    private var shortPath: String {
+        let components = (info.cwd as NSString).pathComponents.filter { $0 != "/" }
+        let tail = components.suffix(2)
+        return tail.joined(separator: "/")
     }
 
     private var relativeTime: String {
@@ -59,11 +65,12 @@ private struct SessionRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(info.title)
                     .font(.system(size: 13, weight: .medium))
-                Text(info.cwd)
+                Text(shortPath)
                     .font(.system(size: 11))
                     .foregroundColor(.secondary)
                     .lineLimit(1)
                     .truncationMode(.middle)
+                    .help(info.cwd)
                 Text(relativeTime)
                     .font(.system(size: 11))
                     .foregroundColor(.secondary)
