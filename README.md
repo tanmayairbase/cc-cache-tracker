@@ -9,9 +9,9 @@ activity. Lose track of that and you eat an expensive silent re-ingestion
 next time you touch a stale session. CacheTracker watches your active
 sessions' last-activity time and warns you before that happens.
 
-It lives in the menu bar rather than next to the notch because most of the
-team works off external monitors. See `handoff-notch-cache-tracker.md` for
-the full design history.
+It lives in the menu bar, not pinned to a specific spot on the built-in
+display, because most of the team works off external monitors. See
+`handoff-notch-cache-tracker.md` for the full design history.
 
 - Badge = count of active sessions, colored by worst case: **blue** (fresh),
   **orange** (45–60 min idle), **red** (60+ min idle, not handed off).
@@ -35,7 +35,7 @@ No launch-at-login yet, so relaunch after reboots.
 ## How it works
 
 `hooks/cache-touch.sh` fires on every Claude Code tool call and on session
-start, writing last-activity state to `~/.claude/notch-tracker/`. The app
+start, writing last-activity state to `~/.claude/cache-tracker/`. The app
 polls that directory every 60s and computes status from elapsed time.
 Marking a session done writes to a separate `handoffs.json` so it's never
 clobbered by the hook. Sessions idle 24h+ drop out of the active list but
@@ -44,4 +44,4 @@ their state file is left on disk.
 ## Uninstall
 
 Remove the `hooks/cache-touch.sh` entries from `~/.claude/settings.json`,
-quit the app, optionally delete `~/.claude/notch-tracker/`.
+quit the app, optionally delete `~/.claude/cache-tracker/`.

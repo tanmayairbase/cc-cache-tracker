@@ -12,7 +12,7 @@ final class SessionStore {
     init(baseDir: URL? = nil) {
         let base = baseDir ?? FileManager.default
             .homeDirectoryForCurrentUser
-            .appendingPathComponent(".claude/notch-tracker", isDirectory: true)
+            .appendingPathComponent(".claude/cache-tracker", isDirectory: true)
         self.stateDir = base
         self.handoffsFile = base.appendingPathComponent("handoffs.json")
         try? FileManager.default.createDirectory(at: stateDir, withIntermediateDirectories: true)

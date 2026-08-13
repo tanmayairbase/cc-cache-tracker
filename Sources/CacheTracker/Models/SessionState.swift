@@ -1,7 +1,7 @@
 import Foundation
 
 /// Mirrors the JSON written by hooks/cache-touch.sh into
-/// ~/.claude/notch-tracker/session-<hash>.json
+/// ~/.claude/cache-tracker/session-<hash>.json
 struct SessionState: Codable, Identifiable, Equatable {
     var sessionId: String
     var cwd: String

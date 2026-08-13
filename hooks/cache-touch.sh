@@ -1,7 +1,7 @@
 #!/bin/bash
 # Claude Code hook (PreToolUse/PostToolUse/SessionStart, matcher "*", sync).
 # Reads the hook JSON envelope on stdin and records last-activity state for
-# the notch cache tracker app. See docs/architecture.md.
+# the CacheTracker menu bar app. See README.md.
 set -euo pipefail
 
 INPUT=$(cat)
@@ -11,7 +11,7 @@ CWD=$(echo "$INPUT" | jq -r '.cwd')
 TRANSCRIPT=$(echo "$INPUT" | jq -r '.transcript_path')
 
 HASH=$(echo -n "$CWD" | md5 | cut -c1-8)
-STATE_DIR="$HOME/.claude/notch-tracker"
+STATE_DIR="$HOME/.claude/cache-tracker"
 mkdir -p "$STATE_DIR"
 
 # Prefer the ai-title Claude Code writes as the transcript's first line;

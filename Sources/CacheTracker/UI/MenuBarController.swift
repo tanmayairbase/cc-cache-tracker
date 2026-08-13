@@ -3,8 +3,8 @@ import SwiftUI
 import Combine
 
 /// Standard menu bar status item hosting a rendered badge image, with a
-/// popover listing sessions on click. Works the same regardless of notch
-/// vs. external monitor setups.
+/// popover listing sessions on click. Works the same regardless of
+/// display/monitor setup.
 ///
 /// The badge is rendered to an NSImage and set as the button's image rather
 /// than embedding a SwiftUI view as a subview — the subview approach fights
