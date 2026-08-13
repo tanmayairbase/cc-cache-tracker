@@ -65,4 +65,13 @@ PLIST
 codesign --force --deep --sign - "$APP_BUNDLE" >/dev/null 2>&1 || true
 
 echo "Built $APP_BUNDLE"
-echo "Run with: open \"$APP_BUNDLE\""
+
+# Install into /Applications so the app has a stable path (survives repo
+# cleanup, shows up in Spotlight/Launchpad) instead of only living inside
+# the repo checkout.
+INSTALLED_APP="/Applications/$APP_NAME.app"
+pkill -9 -f "$INSTALLED_APP/Contents/MacOS/$APP_NAME" >/dev/null 2>&1 || true
+rm -rf "$INSTALLED_APP"
+cp -R "$APP_BUNDLE" "$INSTALLED_APP"
+echo "Installed $INSTALLED_APP"
+echo "Run with: open \"$INSTALLED_APP\""

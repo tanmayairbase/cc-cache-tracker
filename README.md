@@ -26,7 +26,7 @@ Requires `jq`.
 ```
 ./scripts/install-hooks.sh   # merges hooks into ~/.claude/settings.json, doesn't clobber existing ones
 ./scripts/build-app.sh
-open CacheTracker.app
+open /Applications/CacheTracker.app
 ```
 
 Grant notification permission when prompted. No Dock icon, menu bar only.
