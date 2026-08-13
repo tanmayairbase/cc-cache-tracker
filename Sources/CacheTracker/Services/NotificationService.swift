@@ -25,11 +25,11 @@ final class NotificationService {
         post(content)
     }
 
-    func notifyExpired(sessionTitle: String, cwd: String) {
+    func notifyExpiringImminently(sessionTitle: String, cwd: String) {
         let dirName = (cwd as NSString).lastPathComponent
         let content = UNMutableNotificationContent()
-        content.title = "Cache expired"
-        content.body = "Cache likely expired for '\(sessionTitle)' (\(dirName))"
+        content.title = "Cache expiring imminently"
+        content.body = "Cache expiring in 5m for '\(sessionTitle)' (\(dirName))"
         content.sound = .default
         post(content)
     }

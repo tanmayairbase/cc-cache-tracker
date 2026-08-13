@@ -43,7 +43,7 @@ final class Poller: ObservableObject {
             if previous == .fresh && info.status == .orange {
                 notificationService.notifyExpiringSoon(sessionTitle: info.title, cwd: info.cwd)
             } else if previous == .orange && info.status == .red {
-                notificationService.notifyExpired(sessionTitle: info.title, cwd: info.cwd)
+                notificationService.notifyExpiringImminently(sessionTitle: info.title, cwd: info.cwd)
             }
             previousStatuses[info.id] = info.status
         }
