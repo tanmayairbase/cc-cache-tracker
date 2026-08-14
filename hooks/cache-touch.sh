@@ -13,7 +13,10 @@ SESSION_ID=$(echo "$INPUT" | jq -r '.session_id')
 CWD=$(echo "$INPUT" | jq -r '.cwd')
 TRANSCRIPT=$(echo "$INPUT" | jq -r '.transcript_path')
 
-HASH=$(echo -n "$CWD" | md5 | cut -c1-8)
+# Keyed by session_id, not cwd: subagents (e.g. worktree Task calls) share
+# the parent's session_id but run in a different cwd, so keying by cwd would
+# split one logical session into stale duplicate rows.
+HASH=$(echo -n "$SESSION_ID" | md5 | cut -c1-8)
 STATE_DIR="$HOME/.claude/cache-tracker"
 mkdir -p "$STATE_DIR"
 
