@@ -86,8 +86,12 @@ final class MenuBarController: NSObject, NSWindowDelegate {
     }
 
     @objc private func handleClick() {
-        guard let event = NSApp.currentEvent else { return }
-        if event.type == .rightMouseUp {
+        // NSApp.currentEvent can come back nil for the click that triggered
+        // this very action — observed after a status item's screen has been
+        // idle for a while (e.g. an external monitor that hasn't been
+        // interacted with recently). Treat that as a left click rather than
+        // silently no-op'ing, otherwise the popover just fails to appear.
+        if NSApp.currentEvent?.type == .rightMouseUp {
             showContextMenu()
         } else {
             togglePopover()
