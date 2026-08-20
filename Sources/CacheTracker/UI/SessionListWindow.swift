@@ -1,5 +1,8 @@
 import AppKit
 import SwiftUI
+import os.log
+
+private let sessionWindowLog = Logger(subsystem: "com.local.cachetracker", category: "SessionListWindow")
 
 /// A borderless replacement for NSPopover's `show(relativeTo:of:)`.
 ///
@@ -40,12 +43,16 @@ final class SessionListWindow: NSWindow {
     /// Positions the window's top-left just below the given button, on the
     /// same screen the button's own window is on.
     func position(below button: NSStatusBarButton) {
-        guard let buttonWindow = button.window else { return }
+        guard let buttonWindow = button.window else {
+            sessionWindowLog.notice("position(below:): button.window is nil")
+            return
+        }
         let buttonBoundsInWindow = button.convert(button.bounds, to: nil)
         let buttonFrameOnScreen = buttonWindow.convertToScreen(buttonBoundsInWindow)
 
         let x = buttonFrameOnScreen.midX - frame.width / 2
         let y = buttonFrameOnScreen.minY - frame.height - 4
+        sessionWindowLog.notice("position(below:): buttonWindowFrame=\(buttonWindow.frame.debugDescription) buttonFrameOnScreen=\(buttonFrameOnScreen.debugDescription) computedOrigin=(\(x), \(y)) screens=\(NSScreen.screens.map { $0.frame }.map { $0.debugDescription })")
         setFrameOrigin(NSPoint(x: x, y: y))
     }
 

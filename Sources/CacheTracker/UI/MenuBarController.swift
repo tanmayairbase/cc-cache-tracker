@@ -1,6 +1,9 @@
 import AppKit
 import SwiftUI
 import Combine
+import os.log
+
+private let menuBarLog = Logger(subsystem: "com.local.cachetracker", category: "MenuBarController")
 
 /// Standard menu bar status item hosting a rendered badge image, with a
 /// popover listing sessions on click. Works the same regardless of
@@ -91,7 +94,9 @@ final class MenuBarController: NSObject, NSWindowDelegate {
         // idle for a while (e.g. an external monitor that hasn't been
         // interacted with recently). Treat that as a left click rather than
         // silently no-op'ing, otherwise the popover just fails to appear.
-        if NSApp.currentEvent?.type == .rightMouseUp {
+        let eventType = NSApp.currentEvent?.type
+        menuBarLog.notice("handleClick: eventType=\(eventType.map { "\($0.rawValue)" } ?? "nil")")
+        if eventType == .rightMouseUp {
             showContextMenu()
         } else {
             togglePopover()
@@ -114,13 +119,26 @@ final class MenuBarController: NSObject, NSWindowDelegate {
     }
 
     private func togglePopover() {
-        guard let button = statusItem.button else { return }
+        guard let button = statusItem.button else {
+            menuBarLog.notice("togglePopover: no status item button")
+            return
+        }
+        menuBarLog.notice("togglePopover: isVisible=\(self.sessionWindow.isVisible) buttonScreen=\(button.window?.screen?.frame.debugDescription ?? "nil")")
         if sessionWindow.isVisible {
             sessionWindow.orderOut(nil)
         } else {
             sessionWindow.position(below: button)
             NSApp.activate(ignoringOtherApps: true)
-            sessionWindow.makeKeyAndOrderFront(nil)
+            // Reassert collectionBehavior right before showing: WindowServer
+            // can leave the window attached to a stale, inactive Space after
+            // its screen has been idle for a while, even though the behavior
+            // was set correctly at window creation. Re-setting it here forces
+            // WindowServer to recompute space membership against the
+            // currently active Space before we order the window front.
+            sessionWindow.collectionBehavior = [.canJoinAllSpaces, .stationary, .fullScreenAuxiliary]
+            sessionWindow.orderFrontRegardless()
+            sessionWindow.makeKey()
+            menuBarLog.notice("togglePopover: after show frame=\(self.sessionWindow.frame.debugDescription) isVisible=\(self.sessionWindow.isVisible) isOnActiveSpace=\(self.sessionWindow.isOnActiveSpace)")
             // Prevent AppKit from auto-assigning first responder to the
             // first key-view-eligible control (the row menu button), which
             // otherwise shows a native focus ring on it as soon as the
