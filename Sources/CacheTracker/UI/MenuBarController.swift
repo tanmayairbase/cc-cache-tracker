@@ -129,12 +129,14 @@ final class MenuBarController: NSObject, NSWindowDelegate {
         } else {
             sessionWindow.position(below: button)
             NSApp.activate(ignoringOtherApps: true)
-            // Reassert collectionBehavior right before showing: WindowServer
-            // can leave the window attached to a stale, inactive Space after
-            // its screen has been idle for a while, even though the behavior
-            // was set correctly at window creation. Re-setting it here forces
-            // WindowServer to recompute space membership against the
-            // currently active Space before we order the window front.
+            // Simply re-setting collectionBehavior to the same value (tried
+            // previously) was not enough — logging showed isOnActiveSpace
+            // still false right after. WindowServer appears to cache space
+            // membership per-window and only recomputes it on a real
+            // transition, so drop the window from every space first (empty
+            // behavior + orderOut) and then re-add it fresh before showing.
+            sessionWindow.collectionBehavior = []
+            sessionWindow.orderOut(nil)
             sessionWindow.collectionBehavior = [.canJoinAllSpaces, .stationary, .fullScreenAuxiliary]
             sessionWindow.orderFrontRegardless()
             sessionWindow.makeKey()
