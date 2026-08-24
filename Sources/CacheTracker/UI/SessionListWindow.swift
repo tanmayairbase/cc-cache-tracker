@@ -12,22 +12,34 @@ private let sessionWindowLog = Logger(subsystem: "com.local.cachetracker", categ
 /// actually lives on. Activating the app first does not fix it. Computing
 /// the button's screen rect ourselves and positioning a plain NSWindow there
 /// sidesteps NSPopover's internal (buggy) placement logic entirely.
-final class SessionListWindow: NSWindow {
+final class SessionListWindow: NSPanel {
     init(poller: Poller) {
         let size = NSSize(width: 320, height: 240)
         super.init(
             contentRect: NSRect(origin: .zero, size: size),
-            styleMask: [.borderless],
+            styleMask: [.nonactivatingPanel, .borderless],
             backing: .buffered,
             defer: false
         )
 
         isReleasedWhenClosed = false
+        isFloatingPanel = true
         level = .statusBar
         isOpaque = false
         backgroundColor = .clear
         hasShadow = true
-        collectionBehavior = [.canJoinAllSpaces, .stationary, .fullScreenAuxiliary]
+        animationBehavior = .none
+        // NOT `.canJoinAllSpaces`. That behavior is evaluated when the window is
+        // registered with the WindowServer, so a Space created *later* — e.g.
+        // the new managed Space an external display gets after sleep/wake with
+        // "Displays have separate Spaces" on — never includes this window, and
+        // it is then permanently `isVisible == true, isOnActiveSpace == false`.
+        // `.moveToActiveSpace` instead asks the WindowServer to relocate the
+        // window to whatever Space is active each time the app is activated,
+        // which has no stale-Space-set failure mode. This is the same
+        // collection behavior Ice (open source menu bar manager) uses for its
+        // click-to-open bar panel.
+        collectionBehavior = [.moveToActiveSpace, .fullScreenAuxiliary, .ignoresCycle]
 
         let hosting = NSHostingView(
             rootView: SessionListPopover(poller: poller)

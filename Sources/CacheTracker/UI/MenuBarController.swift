@@ -196,19 +196,16 @@ final class MenuBarController: NSObject, NSWindowDelegate {
             sessionWindow.makeKey()
             menuBarLog.notice("togglePopover: after show frame=\(self.sessionWindow.frame.debugDescription) isVisible=\(self.sessionWindow.isVisible) isOnActiveSpace=\(self.sessionWindow.isOnActiveSpace) targetScreen=\(targetScreen?.frame.debugDescription ?? "nil") windowScreen=\(self.sessionWindow.screen?.frame.debugDescription ?? "nil")")
 
-            // If, after all that, the window still isn't on the active Space,
-            // the process-level status bar registration is the thing that's
-            // wrong — not this window. Rebuild the status item and retry once.
+            // If `.moveToActiveSpace` didn't get us there, ask the WindowServer
+            // directly. Recreating the NSStatusItem was tried here previously
+            // and proven useless (the retry still reported isOnActiveSpace
+            // false), which is what pointed at the window's Space association
+            // itself — not the status item — being the stale thing.
             if !sessionWindow.isOnActiveSpace {
-                menuBarLog.notice("togglePopover: still not on active space after show, rebuilding status item and retrying")
-                rebuildStatusItem(reason: "not-on-active-space")
-                if let retryButton = statusItem.button {
-                    sessionWindow.orderOut(nil)
-                    sessionWindow.position(below: retryButton)
-                    sessionWindow.orderFrontRegardless()
-                    sessionWindow.makeKey()
-                    menuBarLog.notice("togglePopover: after retry frame=\(self.sessionWindow.frame.debugDescription) isVisible=\(self.sessionWindow.isVisible) isOnActiveSpace=\(self.sessionWindow.isOnActiveSpace) windowScreen=\(self.sessionWindow.screen?.frame.debugDescription ?? "nil")")
-                }
+                menuBarLog.notice("togglePopover: not on active space after show, forcing via CGS (available=\(SpaceBridge.isAvailable))")
+                let moved = SpaceBridge.moveToActiveSpace(window: sessionWindow, screen: targetScreen)
+                sessionWindow.orderFrontRegardless()
+                menuBarLog.notice("togglePopover: after CGS move moved=\(moved) isVisible=\(self.sessionWindow.isVisible) isOnActiveSpace=\(self.sessionWindow.isOnActiveSpace) windowScreen=\(self.sessionWindow.screen?.frame.debugDescription ?? "nil")")
             }
             // Prevent AppKit from auto-assigning first responder to the
             // first key-view-eligible control (the row menu button), which
