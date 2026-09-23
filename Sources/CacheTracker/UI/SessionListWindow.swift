@@ -13,8 +13,26 @@ private let sessionWindowLog = Logger(subsystem: "com.local.cachetracker", categ
 /// the button's screen rect ourselves and positioning a plain NSWindow there
 /// sidesteps NSPopover's internal (buggy) placement logic entirely.
 final class SessionListWindow: NSPanel {
+    /// Fixed content width; height is recomputed to fit the current session
+    /// count (shrinking below `SessionListPopover.maxVisibleRows`, capped at
+    /// it above) each time the window is about to be shown.
+    private static let contentWidth: CGFloat = 384
+
+    private let hosting: NSHostingView<AnyView>
+
     init(poller: Poller) {
-        let size = NSSize(width: 320, height: 240)
+        let size = NSSize(width: Self.contentWidth, height: 240)
+        let hosting = NSHostingView(
+            rootView: AnyView(
+                SessionListPopover(poller: poller)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color(nsColor: .windowBackgroundColor))
+                    )
+            )
+        )
+        self.hosting = hosting
+
         super.init(
             contentRect: NSRect(origin: .zero, size: size),
             styleMask: [.nonactivatingPanel, .borderless],
@@ -41,15 +59,18 @@ final class SessionListWindow: NSPanel {
         // click-to-open bar panel.
         collectionBehavior = [.moveToActiveSpace, .fullScreenAuxiliary, .ignoresCycle]
 
-        let hosting = NSHostingView(
-            rootView: SessionListPopover(poller: poller)
-                .background(
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(Color(nsColor: .windowBackgroundColor))
-                )
-        )
         hosting.frame = NSRect(origin: .zero, size: size)
         contentView = hosting
+    }
+
+    /// Resizes the window to fit the current session list (shrinking below
+    /// `SessionListPopover.maxVisibleRows`, capped at it above). Must run
+    /// before `position(below:)`, which reads `frame.height` to compute the
+    /// final origin, so the origin set here is only a placeholder.
+    func sizeToFitContent() {
+        let fitted = hosting.fittingSize
+        setContentSize(NSSize(width: Self.contentWidth, height: fitted.height))
+        hosting.frame = NSRect(origin: .zero, size: NSSize(width: Self.contentWidth, height: fitted.height))
     }
 
     /// Positions the window's top-left just below the given button, on the

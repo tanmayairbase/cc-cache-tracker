@@ -190,6 +190,7 @@ final class MenuBarController: NSObject, NSWindowDelegate {
         if sessionWindow.isVisible {
             sessionWindow.orderOut(nil)
         } else {
+            sessionWindow.sizeToFitContent()
             let targetScreen = sessionWindow.position(below: button)
             NSApp.activate(ignoringOtherApps: true)
             sessionWindow.orderFrontRegardless()
