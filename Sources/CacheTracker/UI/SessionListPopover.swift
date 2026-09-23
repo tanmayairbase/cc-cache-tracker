@@ -3,6 +3,13 @@ import SwiftUI
 struct SessionListPopover: View {
     @ObservedObject var poller: Poller
 
+    /// Height of one `SessionRow` + its trailing `Divider`, as actually
+    /// rendered (measured empirically — SwiftUI's font-metric-derived line
+    /// heights run taller than the raw point sizes would suggest). Used to
+    /// cap the list at `maxVisibleRows` before it scrolls.
+    static let rowHeight: CGFloat = 75
+    static let maxVisibleRows = 9
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("Claude Code Sessions")
@@ -15,12 +22,18 @@ struct SessionListPopover: View {
                     .foregroundColor(.secondary)
                     .padding(12)
             } else {
-                ForEach(poller.sessions) { info in
-                    SessionRow(info: info) {
-                        poller.markHandedOff(sessionId: info.id)
+                ScrollView {
+                    ForEach(poller.sessions) { info in
+                        SessionRow(info: info) {
+                            poller.markHandedOff(sessionId: info.id)
+                        }
+                        Divider()
                     }
-                    Divider()
                 }
+                // An explicit height (not `maxHeight`) so `NSHostingView.fittingSize`
+                // measures a fixed value here rather than guessing at the
+                // ScrollView's ideal size along its scroll axis.
+                .frame(height: CGFloat(min(poller.sessions.count, Self.maxVisibleRows)) * Self.rowHeight)
             }
         }
         .frame(width: 384)
@@ -65,6 +78,7 @@ private struct SessionRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(info.title)
                     .font(.system(size: 13, weight: .medium))
+                    .lineLimit(1)
                 Text(shortPath)
                     .font(.system(size: 11))
                     .foregroundColor(.secondary)
