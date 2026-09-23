@@ -3,10 +3,11 @@ import SwiftUI
 struct SessionListPopover: View {
     @ObservedObject var poller: Poller
 
-    /// Height of a single `SessionRow` plus its trailing `Divider`, measured
-    /// from the row's fixed font sizes and padding. Used to cap the list at
-    /// `maxVisibleRows` before it scrolls.
-    static let rowHeight: CGFloat = 58
+    /// Height of one `SessionRow` + its trailing `Divider`, as actually
+    /// rendered (measured empirically — SwiftUI's font-metric-derived line
+    /// heights run taller than the raw point sizes would suggest). Used to
+    /// cap the list at `maxVisibleRows` before it scrolls.
+    static let rowHeight: CGFloat = 75
     static let maxVisibleRows = 9
 
     var body: some View {
