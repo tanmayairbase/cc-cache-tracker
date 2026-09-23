@@ -16,6 +16,9 @@ display, because most of the team works off external monitors.
   **orange** (40–55 min idle), **red** (55+ min idle, not handed off).
 - Notification when a session first crosses into orange, and again when it
   crosses into red.
+  <img width="359" height="92" alt="Screenshot 2026-08-26 at 12-41-29" src="https://github.com/user-attachments/assets/7be4dd22-1f13-47c6-b0f0-7dc16473be23" /> and <img width="362" height="92" alt="Screenshot 2026-08-26 at 12-56-20" src="https://github.com/user-attachments/assets/5f7f7512-b33d-4598-8335-c9089c897471" />
+
+
 - Click the badge for a session list; check one off to mark it done/handed
   off (auto-reopens if that session sees new activity).
 
